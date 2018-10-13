@@ -1,17 +1,33 @@
+/**
+ * reference: https://t-cr.jp/article/fe164849a4e6835d
+ */
+
 const imgmin = require('imagemin');
 const pngquant = require('imagemin-pngquant');
 const mozjpeg = require('imagemin-mozjpeg');
 const gifsicle = require('imagemin-gifsicle');
 const svgo = require('imagemin-svgo');
-const notice = require('node-notifier');
+const glob = require('glob');
 
-imgmin(['src/**/*.{jpg,jpeg,png,gif,svg}'], 'dist', {
-  plugins: [
-    pngquant({ quality: '65-80' }),
-    mozjpeg({ quality: 80 }),
-    gifsicle(),
-    svgo()
-  ]
-}).then(() => {
-  notice.notify('画像圧縮が終了しました')
-});
+const baseDir = './docs';
+const dirJpg = glob.sync(`${baseDir}/**/*.{jpeg,jpg}`);
+const dirPng = glob.sync(`${baseDir}/**/*.png`);
+const dirGif = glob.sync(`${baseDir}/**/*.gif`);
+const dirSvg = glob.sync(`${baseDir}/**/*.svg`);
+
+const outputFunc = (type, tool) => {
+  type.forEach(file => {
+    const dir = file.split('/');
+    dir.pop();
+    imgmin([file], dir.join('/'), {
+      use: [tool]
+    }).then(() => {
+      console.log(`${file}の圧縮が完了しました`);
+    })
+  })
+}
+
+outputFunc(dirJpg, mozjpeg());
+outputFunc(dirPng, pngquant());
+outputFunc(dirGif, gifsicle());
+outputFunc(dirSvg, svgo({plugins: [{removeViewBox: false}]}));
