@@ -9,7 +9,7 @@ const gifsicle = require('imagemin-gifsicle');
 const svgo = require('imagemin-svgo');
 const glob = require('glob');
 
-const baseDir = './docs';
+const baseDir = './src/images';
 const dirJpg = glob.sync(`${baseDir}/**/*.{jpeg,jpg}`);
 const dirPng = glob.sync(`${baseDir}/**/*.png`);
 const dirGif = glob.sync(`${baseDir}/**/*.gif`);
@@ -19,10 +19,10 @@ const outputFunc = (type, tool) => {
   type.forEach(file => {
     const dir = file.split('/');
     dir.pop();
-    imgmin([file], dir.join('/'), {
+    imgmin([file], dir.join('/').replace('src', 'dist'), {
       use: [tool]
     }).then(() => {
-      console.log(`${file}の圧縮が完了しました`);
+      console.log(`${file.replace('src', 'dist')}の圧縮が完了しました`);
     })
   })
 }
