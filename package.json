@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "imgmin": "node imgmin.js"
+    "imgmin": "node ./lib/imgmin.js"
   },
   "repository": {
     "type": "git",
