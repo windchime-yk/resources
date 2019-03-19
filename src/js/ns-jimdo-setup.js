@@ -1,0 +1,1 @@
+novelSupport('content_area', {content: 'html'});
