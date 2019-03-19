@@ -1,7 +1,10 @@
 {
   "private": true,
   "scripts": {
-    "imgmin": "node ./lib/imgmin.js"
+    "build:images": "node ./lib/imgmin.js",
+    "build:movie": "node ./lib/movie2gif.js",
+    "build:js": "babel ./src/js/ -d ./dist/js/",
+    "build": "npm-run-all build:*"
   },
   "repository": {
     "type": "git",
@@ -9,11 +12,16 @@
   },
   "homepage": "https://github.com/windchime-yk/resource-img#readme",
   "devDependencies": {
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.3.4",
+    "@babel/preset-env": "^7.3.4",
+    "gifify": "^2.4.2",
     "glob": "^7.1.3",
     "imagemin": "^6.0.0",
     "imagemin-gifsicle": "^5.2.0",
     "imagemin-mozjpeg": "^7.0.0",
     "imagemin-pngquant": "^6.0.0",
-    "imagemin-svgo": "^7.0.0"
+    "imagemin-svgo": "^7.0.0",
+    "npm-run-all": "^4.1.5"
   }
 }
