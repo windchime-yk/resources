@@ -2,7 +2,6 @@
   "private": true,
   "scripts": {
     "build:images": "node ./lib/imgmin.js",
-    "build:movie": "node ./lib/movie2gif.js",
     "build:js": "babel ./src/js/ -d ./dist/js/",
     "build": "npm-run-all build:*"
   },
