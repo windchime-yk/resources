@@ -1,3 +1,3 @@
 window.addEventListener('load', () => {
-  novelSupport('content_area', {content: 'html'});
+  if (window.location.host !== 'cms.e.jimdo.com') novelSupport('content_area', {content: 'html'});
 })
