@@ -31,6 +31,9 @@ const handler: Handler = async (req) => {
     pathname.replace("/js/", "/ts/").replace(".js", ".ts");
   const fileName = `./src/${convert(pathname)}`;
 
+  // TODO: 検証後削除
+  console.log({ typeName, fileName, pathname });
+
   if (isExistFileSync(fileName)) {
     if (typeName === "js") {
       const jsFile = await Deno.readFile(fileName);
