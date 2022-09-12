@@ -5,7 +5,7 @@ import {
 } from "https://deno.land/std@0.117.0/http/server.ts";
 import { h, html } from "https://deno.land/x/htm@0.0.10/mod.tsx";
 import { transform } from "https://deno.land/x/esbuild@v0.15.7/mod.js";
-import { isExistFileSync } from "https://pax.deno.dev/windchime-yk/deno-util@v1.6.0/file.ts";
+import { isExistFileSync, getFileList } from "https://pax.deno.dev/windchime-yk/deno-util@v1.6.0/file.ts";
 import { contentType } from "https://deno.land/std@0.152.0/media_types/mod.ts";
 
 const handler: Handler = async (req) => {
@@ -33,6 +33,7 @@ const handler: Handler = async (req) => {
 
   // TODO: 検証後削除
   console.log({ typeName, fileName, pathname });
+  console.log(await getFileList('src'));
 
   if (isExistFileSync(fileName)) {
     if (typeName === "js") {
