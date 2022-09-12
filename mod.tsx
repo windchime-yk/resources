@@ -33,7 +33,7 @@ const handler: Handler = async (req) => {
 
   // TODO: 検証後削除
   console.log({ typeName, fileName, pathname });
-  console.log(await getFileList('src'));
+  console.log(await getFileList('assets'));
 
   if (isExistFileSync(fileName)) {
     console.log('isExistFileSync通過');
