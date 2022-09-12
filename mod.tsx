@@ -36,7 +36,11 @@ const handler: Handler = async (req) => {
   console.log(await getFileList('src'));
 
   if (isExistFileSync(fileName)) {
+    console.log('isExistFileSync通過');
+
     if (typeName === "js") {
+      console.log('typeName通過');
+
       const jsFile = await Deno.readFile(fileName);
       const transformed = await transform(jsFile, {
         minify: true,
@@ -48,6 +52,7 @@ const handler: Handler = async (req) => {
       });
     }
   }
+  console.log('js配信を通り抜けてしまった');
 
   return html({
     lang: "ja",
