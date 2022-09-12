@@ -37,7 +37,7 @@ const handler: Handler = async (req) => {
   console.log(isExistFileSync(fileName));
   console.log(await isExistFile(fileName));
 
-  if (isExistFileSync(fileName)) {
+  if (await isExistFile(fileName)) {
     console.log('isExistFileSync通過');
 
     if (typeName === "js") {
