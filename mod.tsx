@@ -29,7 +29,7 @@ const handler: Handler = async (req) => {
   const typeName = router.exec(req.url)?.pathname.groups.type;
   const convert = (pathname: string) =>
     pathname.replace("/js/", "/ts/").replace(".js", ".ts");
-  const fileName = `./src${convert(pathname)}`;
+  const fileName = `${Deno.cwd()}/src${convert(pathname)}`;
 
   // TODO: 検証後削除
   console.log({ typeName, fileName, pathname });
