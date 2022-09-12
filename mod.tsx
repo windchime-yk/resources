@@ -4,6 +4,7 @@ import {
   serve,
 } from "https://deno.land/std@0.117.0/http/server.ts";
 import { h, html } from "https://deno.land/x/htm@0.0.10/mod.tsx";
+import { transform } from "https://deno.land/x/esbuild@v0.15.7/mod.js";
 import { isExistFileSync } from "https://pax.deno.dev/windchime-yk/deno-util@v1.6.0/file.ts";
 import { contentType } from "https://deno.land/std@0.152.0/media_types/mod.ts";
 
@@ -26,12 +27,17 @@ const handler: Handler = async (req) => {
 
   const router = new URLPattern({ pathname: "/:type/*" });
   const typeName = router.exec(req.url)?.pathname.groups.type;
-  const fileName = `./src/${pathname}`;
+  const convert = (pathname: string) =>
+    pathname.replace("/js/", "/ts/").replace(".js", ".ts");
+  const fileName = `./src/${convert(pathname)}`;
 
   if (isExistFileSync(fileName)) {
     if (typeName === "js") {
       const jsFile = await Deno.readFile(fileName);
-      return new Response(jsFile, {
+      const transformed = await transform(jsFile, {
+        minify: true,
+      });
+      return new Response(transformed.code, {
         headers: {
           "Content-Type": contentType(typeName),
         },
