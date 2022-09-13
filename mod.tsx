@@ -42,6 +42,7 @@ const handler: Handler = async (req) => {
   return html({
     lang: "ja",
     title: `404 Not Found | ${TITLE}`,
+    status: 404,
     body: (
       <section>
         <h1>404 Not Found</h1>
