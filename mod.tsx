@@ -4,7 +4,7 @@ import {
   serve,
 } from "https://deno.land/std@0.117.0/http/server.ts";
 import { h, html } from "https://deno.land/x/htm@0.0.10/mod.tsx";
-import { transform } from "https://deno.land/x/esbuild@v0.15.7/mod.js";
+import { emit } from "https://deno.land/x/emit@0.9.0/mod.ts";
 import { isExistFileSync, isExistFile, getFileList } from "https://pax.deno.dev/windchime-yk/deno-util@v1.6.0/file.ts";
 import { contentType } from "https://deno.land/std@0.152.0/media_types/mod.ts";
 
@@ -43,11 +43,11 @@ const handler: Handler = async (req) => {
     if (typeName === "js") {
       console.log('typeName通過');
 
-      const jsFile = await Deno.readFile(fileName);
-      const transformed = await transform(jsFile, {
-        minify: true,
-      });
-      return new Response(transformed.code, {
+      const url = new URL(fileName, import.meta.url)
+      const result = await emit(url)
+      const code = result[url.href]
+
+      return new Response(code, {
         headers: {
           "Content-Type": contentType(typeName),
         },
