@@ -4,3 +4,7 @@ window.addEventListener("load", () => {
     novelSupport("#content_area", { content: "html" });
   }
 });
+
+declare function novelSupport(elem: string, options: {
+  content?: string;
+}): void;

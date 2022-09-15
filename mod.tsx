@@ -49,7 +49,7 @@ const handler: Handler = async (req) => {
 
       const url = new URL(fileName, import.meta.url);
       const result = await emit(url, {
-        cacheRoot: '/',
+        cacheRoot: "/",
       });
       const code = result[url.href];
 
