@@ -50,16 +50,6 @@ const handler: Handler = async (req) => {
       const url = new URL(fileName, import.meta.url);
       const result = await emit(url, {
         cacheRoot: '/',
-        load(specifier) {
-          return Promise.resolve({
-            kind: "module",
-            specifier,
-            headers: {
-              "content-type": "application/javascript; charset=utf-8",
-            },
-            content: "",
-          });
-        },
       });
       const code = result[url.href];
 
