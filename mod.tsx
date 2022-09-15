@@ -4,8 +4,12 @@ import {
   serve,
 } from "https://deno.land/std@0.117.0/http/server.ts";
 import { h, html } from "https://deno.land/x/htm@0.0.10/mod.tsx";
-import { emit } from "https://deno.land/x/emit@0.9.0/mod.ts";
-import { isExistFileSync, isExistFile, getFileList } from "https://pax.deno.dev/windchime-yk/deno-util@v1.6.0/file.ts";
+import { emit } from "https://deno.land/x/emit@0.7.0/mod.ts";
+import {
+  getFileList,
+  isExistFile,
+  isExistFileSync,
+} from "https://pax.deno.dev/windchime-yk/deno-util@v1.6.0/file.ts";
 import { contentType } from "https://deno.land/std@0.152.0/media_types/mod.ts";
 
 const handler: Handler = async (req) => {
@@ -33,21 +37,31 @@ const handler: Handler = async (req) => {
 
   // TODO: 検証後削除
   console.log({ typeName, fileName, pathname });
-  console.log(await getFileList('assets'));
+  console.log(await getFileList("assets"));
   console.log(isExistFileSync(fileName));
   console.log(await isExistFile(fileName));
 
   if (await isExistFile(fileName)) {
-    console.log('isExistFileSync通過');
+    console.log("isExistFileSync通過");
 
     if (typeName === "js") {
-      console.log('typeName通過');
+      console.log("typeName通過");
 
-      const url = new URL(fileName, import.meta.url)
+      const url = new URL(fileName, import.meta.url);
       const result = await emit(url, {
-        cacheSetting: 'only',
-      })
-      const code = result[url.href]
+        cacheRoot: '/',
+        load(specifier) {
+          return Promise.resolve({
+            kind: "module",
+            specifier,
+            headers: {
+              "content-type": "application/javascript; charset=utf-8",
+            },
+            content: "",
+          });
+        },
+      });
+      const code = result[url.href];
 
       return new Response(code, {
         headers: {
@@ -56,7 +70,7 @@ const handler: Handler = async (req) => {
       });
     }
   }
-  console.log('js配信を通り抜けてしまった');
+  console.log("js配信を通り抜けてしまった");
 
   return html({
     lang: "ja",
