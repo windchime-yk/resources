@@ -44,7 +44,9 @@ const handler: Handler = async (req) => {
       console.log('typeName通過');
 
       const url = new URL(fileName, import.meta.url)
-      const result = await emit(url)
+      const result = await emit(url, {
+        cacheSetting: 'only',
+      })
       const code = result[url.href]
 
       return new Response(code, {
