@@ -43,6 +43,34 @@ const handler: Handler = async (req) => {
         },
       });
     }
+
+    const imageExtentionList = ["jpg", "jpeg", "png", "svg", "webp"] as const;
+    const extentionName = pathname.split(".").at(
+      -1,
+    ) as typeof imageExtentionList[number];
+
+    if (typeName === "images" && imageExtentionList.includes(extentionName)) {
+      try {
+        const imgFile = await Deno.open(fileName);
+        return new Response(imgFile.readable, {
+          headers: {
+            "Content-Type": contentType(extentionName),
+          },
+        });
+      } catch (error) {
+        return html({
+          lang: "ja",
+          title: `404 Not Found | ${TITLE}`,
+          status: 404,
+          body: (
+            <section>
+              <h1>404 Not Found</h1>
+              <p>存在しないコンテンツにアクセスしているようです。TOPページに移動してください。</p>
+            </section>
+          ),
+        });
+      }
+    }
   }
 
   return html({
