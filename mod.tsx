@@ -1,91 +1,116 @@
-/** @jsx h */
-import {
-  type Handler,
-  serve,
-} from "https://deno.land/std@0.117.0/http/server.ts";
-import { h, html } from "https://deno.land/x/htm@0.0.10/mod.tsx";
-import { emit } from "https://deno.land/x/emit@0.7.0/mod.ts";
-import { isExistFile } from "https://pax.deno.dev/windchime-yk/deno-util@v1.6.0/file.ts";
-import { contentType } from "https://deno.land/std@0.152.0/media_types/mod.ts";
+import { Hono } from "@hono/hono";
+import { transpile } from "@deno/emit";
+import { contentType } from "@std/media-types";
+import { isExistFile } from "@whyk/utils/file";
+import { Child } from "@hono/hono/jsx";
 
-const handler: Handler = async (req) => {
-  const { pathname } = new URL(req.url);
-  const TITLE = "WhyK Resources";
+const TITLE = "WhyK Resources";
+const app = new Hono();
 
-  if (pathname === "/") {
-    return html({
-      lang: "ja",
-      title: TITLE,
-      body: (
-        <section>
-          <h1>{TITLE}</h1>
-          <p>このサービスはWhyKが静的資材を配信するために作られました。</p>
-        </section>
-      ),
-    });
-  }
-
-  const router = new URLPattern({ pathname: "/:type/*" });
-  const typeName = router.exec(req.url)?.pathname.groups.type;
-  const convert = (pathname: string) =>
-    pathname.replace("/js/", "/ts/").replace(".js", ".ts");
-  const fileName = `assets${convert(pathname)}`;
-
-  if (await isExistFile(fileName)) {
-    if (typeName === "js") {
-      const url = new URL(fileName, import.meta.url);
-      const result = await emit(url, { cacheRoot: "/" });
-      const code = result[url.href];
-
-      return new Response(code, {
-        headers: {
-          "Content-Type": contentType(typeName),
-        },
-      });
-    }
-
-    const imageExtentionList = ["jpg", "jpeg", "png", "svg", "webp"] as const;
-    const extentionName = pathname.split(".").at(
-      -1,
-    ) as typeof imageExtentionList[number];
-
-    if (typeName === "images" && imageExtentionList.includes(extentionName)) {
-      try {
-        const imgFile = await Deno.open(fileName);
-        return new Response(imgFile.readable, {
-          headers: {
-            "Content-Type": contentType(extentionName),
-          },
-        });
-      } catch (error) {
-        return html({
-          lang: "ja",
-          title: `404 Not Found | ${TITLE}`,
-          status: 404,
-          body: (
-            <section>
-              <h1>404 Not Found</h1>
-              <p>存在しないコンテンツにアクセスしているようです。TOPページに移動してください。</p>
-            </section>
-          ),
-        });
-      }
-    }
-  }
-
-  return html({
-    lang: "ja",
-    title: `404 Not Found | ${TITLE}`,
-    status: 404,
-    body: (
-      <section>
-        <h1>404 Not Found</h1>
-        <p>存在しないコンテンツにアクセスしているようです。TOPページに移動してください。</p>
-      </section>
-    ),
-  });
+interface LayoutProps {
+  subTitle?: string;
+  children: Child;
+}
+const Layout = (props: LayoutProps) => {
+  return (
+    <html>
+      <head>
+        <title>{props.subTitle ? `${props.subTitle} | ${TITLE}` : TITLE}</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="https://fonts.xz.style/serve/inter.css" />
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/@exampledev/new.css@1.1.2/new.min.css"
+        />
+      </head>
+      <body>
+        <header>{TITLE}</header>
+        <main>
+          {props.children}
+        </main>
+      </body>
+    </html>
+  );
 };
 
-const PORT = 8080;
-serve(handler, { addr: `:${PORT}` });
-console.log(`listen to http://localhost:${PORT}`);
+app.get("/", (c) => {
+  return c.html(
+    <Layout>
+      <section>
+        <h1>WhyK Resources</h1>
+        <p>このサービスはWhyKが静的資材を配信するために作られました。</p>
+      </section>
+    </Layout>,
+  );
+});
+
+app.get("/js/*", async (c) => {
+  const pathname = c.req.path;
+  const fileName = `assets${pathname}`.replace("/js/", "/ts/").replace(
+    ".js",
+    ".ts",
+  );
+  const isExistTsFile = await isExistFile(fileName);
+
+  if (!isExistTsFile) {
+    return c.notFound();
+  }
+
+  const url = new URL(fileName, import.meta.url);
+  const result = await transpile(url, { cacheRoot: "/" });
+  const code = result.get(url.href);
+
+  if (!code) {
+    return c.notFound();
+  }
+
+  return c.body(code, 200, {
+    "Content-Type": contentType("js"),
+  });
+});
+
+app.get("/images/*", async (c) => {
+  const pathname = c.req.path;
+  const fileName = `assets${pathname}`;
+  const imageExtentionList = ["jpg", "jpeg", "png", "svg", "webp"] as const;
+  const extentionName = pathname.split(".").at(
+    -1,
+  ) as typeof imageExtentionList[number];
+  const isExistImageFile = await isExistFile(fileName);
+
+  if (!imageExtentionList.includes(extentionName)) {
+    return c.notFound();
+  }
+
+  if (!isExistImageFile) {
+    return c.notFound();
+  }
+
+  try {
+    const imgFile = await Deno.open(fileName);
+    return c.body(imgFile.readable, 200, {
+      "Content-Type": contentType(extentionName),
+    });
+  } catch (_error) {
+    return c.notFound();
+  }
+});
+
+app.notFound((c) => {
+  return c.html(
+    <Layout subTitle="404 Not Found">
+      <section>
+        <h1>404 Not Found</h1>
+        <p>
+          存在しないコンテンツにアクセスしているようです。<a href="/">
+            TOPページ
+          </a>に移動してください。
+        </p>
+      </section>
+    </Layout>,
+    404,
+  );
+});
+
+Deno.serve({ port: 8080 }, app.fetch);

@@ -1,6 +1,18 @@
 {
   "tasks": {
-    "dev": "deno run --allow-net --allow-read --allow-env --no-lock --watch ./mod.tsx",
-    "fmt": "deno fmt --ignore=README.md"
+    "dev": "deno run -NRWE --watch ./mod.tsx"
+  },
+  "fmt": {
+    "exclude": ["README.md"]
+  },
+  "imports": {
+    "@deno/emit": "jsr:@deno/emit@^0.46.0",
+    "@hono/hono": "jsr:@hono/hono@^4.9.0",
+    "@std/media-types": "jsr:@std/media-types@^1.1.0",
+    "@whyk/utils": "jsr:@whyk/utils@^1.7.1"
+  },
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "@hono/hono/jsx"
   }
 }
