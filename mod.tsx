@@ -18,30 +18,30 @@ const Layout = (props: LayoutProps) => {
         <title>{props.subTitle ? `${props.subTitle} | ${TITLE}` : TITLE}</title>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <link rel="stylesheet" href="https://fonts.xz.style/serve/inter.css" />
-      <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/@exampledev/new.css@1.1.2/new.min.css"
-      />
+        <link rel="stylesheet" href="https://fonts.xz.style/serve/inter.css" />
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/@exampledev/new.css@1.1.2/new.min.css"
+        />
       </head>
       <body>
         <header>{TITLE}</header>
         <main>
-        {props.children}
+          {props.children}
         </main>
       </body>
     </html>
   );
-}
+};
 
 app.get("/", (c) => {
   return c.html(
     <Layout>
       <section>
-      <h1>WhyK Resources</h1>
-      <p>このサービスはWhyKが静的資材を配信するために作られました。</p>
+        <h1>WhyK Resources</h1>
+        <p>このサービスはWhyKが静的資材を配信するために作られました。</p>
       </section>
-    </Layout>
+    </Layout>,
   );
 });
 
@@ -54,7 +54,7 @@ app.get("/js/*", async (c) => {
   const isExistTsFile = await isExistFile(fileName);
 
   if (!isExistTsFile) {
-    return c.notFound()
+    return c.notFound();
   }
 
   const url = new URL(fileName, import.meta.url);
@@ -62,7 +62,7 @@ app.get("/js/*", async (c) => {
   const code = result.get(url.href);
 
   if (!code) {
-    return c.notFound()
+    return c.notFound();
   }
 
   return c.body(code, 200, {
@@ -80,11 +80,11 @@ app.get("/images/*", async (c) => {
   const isExistImageFile = await isExistFile(fileName);
 
   if (!imageExtentionList.includes(extentionName)) {
-    return c.notFound()
+    return c.notFound();
   }
 
   if (!isExistImageFile) {
-    return c.notFound()
+    return c.notFound();
   }
 
   try {
@@ -93,19 +93,22 @@ app.get("/images/*", async (c) => {
       "Content-Type": contentType(extentionName),
     });
   } catch (_error) {
-    return c.notFound()
+    return c.notFound();
   }
 });
 
 app.notFound((c) => {
   return c.html(
     <Layout subTitle="404 Not Found">
-    <section>
-      <h1>404 Not Found</h1>
-      <p>存在しないコンテンツにアクセスしているようです。<a href="/">TOPページ</a>に移動してください。</p>
-    </section>
-    </Layout>
-    ,
+      <section>
+        <h1>404 Not Found</h1>
+        <p>
+          存在しないコンテンツにアクセスしているようです。<a href="/">
+            TOPページ
+          </a>に移動してください。
+        </p>
+      </section>
+    </Layout>,
     404,
   );
 });
