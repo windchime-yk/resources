@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "dev": "deno run -NRWE --watch ./main.tsx"
+    "dev": "deno run -NRWE --watch ./mod.tsx"
   },
   "fmt": {
     "exclude": ["README.md"]
